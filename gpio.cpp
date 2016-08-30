@@ -174,7 +174,7 @@ void gpio_write(int fd, byte value) {
   static const char value_str[] = "01";
 
   if (1 != write(fd, &value_str[LOW==value?0:1], 1)) {
-    DEBUG_PRINT("gpio_write: failed to write value on pin ");
+    DEBUG_PRINT("gpio_write: failed to write value on pin");
   }
 }
 
