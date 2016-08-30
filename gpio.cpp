@@ -23,7 +23,7 @@
  
 #include "gpio.h"
 
-#if defined(OSPI) || defined(OSBO)
+#if defined(OSPI)
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -59,7 +59,7 @@ static byte GPIOExport(int pin) {
 
   fd = open("/sys/class/gpio/export", O_WRONLY);
   if (fd < 0) {
-    DEBUG_PRINTLN("failed to open export for writing");
+    DEBUG_PRINTLN("GPIOExport: failed to open export for writing");
     return 0;
   }
 
@@ -76,7 +76,7 @@ static byte GPIOUnexport(int pin) {
 
   fd = open("/sys/class/gpio/unexport", O_WRONLY);
   if (fd < 0) {
-    DEBUG_PRINTLN("failed to open unexport for writing");
+    DEBUG_PRINTLN("GPIOUnexport: failed to open unexport for writing");
     return 0;
   }
 
@@ -95,7 +95,7 @@ static byte GPIOSetEdge(int pin, const char *edge) {
 
   fd = open(path, O_WRONLY);
   if (fd < 0) {
-    DEBUG_PRINTLN("failed to open gpio edge for writing");
+    DEBUG_PRINTLN("GPIOSetEdge: failed to open gpio edge for writing");
     return 0;
   }
   write(fd, edge, strlen(edge)+1);
@@ -119,12 +119,12 @@ void pinMode(int pin, byte mode) {
 
   fd = open(path, O_WRONLY);
   if (fd < 0) {
-    DEBUG_PRINTLN("failed to open gpio direction for writing");
+    DEBUG_PRINTLN("pinMode: failed to open gpio direction for writing");
     return;
   }
 
   if (-1 == write(fd, &dir_str[INPUT==mode?0:3], INPUT==mode?2:3)) {
-    DEBUG_PRINTLN("failed to set direction");
+    DEBUG_PRINTLN("pinMode: failed to set direction");
     return;
   }
 
@@ -140,7 +140,7 @@ int gpio_fd_open(int pin, int mode) {
   snprintf(path, BUFFER_MAX, "/sys/class/gpio/gpio%d/value", pin);
   fd = open(path, mode);
   if (fd < 0) {
-    DEBUG_PRINTLN("failed to open gpio");
+    DEBUG_PRINTLN("gpio_fd_open: failed to open gpio");
     return -1;
   }
   return fd;
@@ -161,7 +161,7 @@ byte digitalRead(int pin) {
   }
 
   if (read(fd, value_str, 3) < 0) {
-    DEBUG_PRINTLN("failed to read value");
+    DEBUG_PRINTLN("digitalRead: failed to read value");
     return 0;
   }
 
@@ -174,7 +174,7 @@ void gpio_write(int fd, byte value) {
   static const char value_str[] = "01";
 
   if (1 != write(fd, &value_str[LOW==value?0:1], 1)) {
-    DEBUG_PRINT("failed to write value on pin ");
+    DEBUG_PRINT("gpio_write: failed to write value on pin ");
   }
 }
 
@@ -257,7 +257,7 @@ void attachInterrupt(int pin, const char* mode, void (*isr)(void)) {
   // open gpio file
   if(sysFds[pin]==-1) {
     if((sysFds[pin]=open(path, O_RDWR))<0) {
-      DEBUG_PRINTLN("failed to open gpio value for reading");
+      DEBUG_PRINTLN("attachInterrupt: failed to open gpio value for reading");
       return;
     }
   }
