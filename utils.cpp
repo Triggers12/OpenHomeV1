@@ -28,7 +28,7 @@ extern OpenHome os;
 void nvm_read_block(void *dst, const void *src, int len) {
   FILE *fp = fopen(get_filename_fullpath(NVM_FILENAME), "rb");
   if(fp) {
-    fseek(fp, (unsigned int)src, SEEK_SET);
+    fseek(fp, (intptr_t)src, SEEK_SET);
     fread(dst, 1, len, fp);
     fclose(fp);
   }
@@ -40,7 +40,7 @@ void nvm_write_block(const void *src, void *dst, int len) {
     fp = fopen(get_filename_fullpath(NVM_FILENAME), "wb");
   }
   if(fp) {
-    fseek(fp, (unsigned int)dst, SEEK_SET);
+    fseek(fp, (intptr_t)dst, SEEK_SET);
     fwrite(src, 1, len, fp);
     fclose(fp);
   } else {
@@ -52,7 +52,7 @@ byte nvm_read_byte(const byte *p) {
   FILE *fp = fopen(get_filename_fullpath(NVM_FILENAME), "rb");
   byte v = 0;
   if(fp) {
-    fseek(fp, (unsigned int)p, SEEK_SET);
+    fseek(fp, (intptr_t)p, SEEK_SET);
     fread(&v, 1, 1, fp);
     fclose(fp);
   } else {
@@ -67,7 +67,7 @@ void nvm_write_byte(const byte *p, byte v) {
     fp = fopen(get_filename_fullpath(NVM_FILENAME), "wb");
   }
   if(fp) {
-    fseek(fp, (unsigned int)p, SEEK_SET);
+    fseek(fp, (intptr_t)p, SEEK_SET);
     fwrite(&v, 1, 1, fp);
     fclose(fp);
   } else {
