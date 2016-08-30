@@ -11,9 +11,9 @@ done
 echo "Building OpenHome..."
 
 if [ "$1" == "demo" ]; then
-	g++ -o OpenHome Wno-int-to-pointer-cast -DDEMO main.cpp OpenHome.cpp program.cpp server.cpp utils.cpp weather.cpp gpio.cpp etherport.cpp -lpthread
+	g++ -o OpenHome -Wno-int-to-pointer-cast -DDEMO main.cpp OpenHome.cpp program.cpp server.cpp utils.cpp weather.cpp gpio.cpp etherport.cpp -lpthread
 else
-	g++ -o OpenHome Wno-int-to-pointer-cast -DOSPI main.cpp OpenHome.cpp program.cpp server.cpp utils.cpp weather.cpp gpio.cpp etherport.cpp -lpthread
+	g++ -o OpenHome -Wno-int-to-pointer-cast -DOSPI main.cpp OpenHome.cpp program.cpp server.cpp utils.cpp weather.cpp gpio.cpp etherport.cpp -lpthread
 fi
 
 # if [ ! "$SILENT" = true ] && [ -f OpenHome.launch ] && [ ! -f /etc/init.d/OpenHome.sh ]; then
