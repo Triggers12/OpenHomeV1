@@ -152,23 +152,24 @@ void do_loop()
     }
 
     // ====== Check rain sensor status ======
-    if (os.options[OPTION_SENSOR_TYPE] == SENSOR_TYPE_RAIN) { // if a rain sensor is connected
-      os.rainsensor_status();
-      if (os.old_status.rain_sensed != os.status.rain_sensed) {
-        if (os.status.rain_sensed) {
-          // rain sensor on, record time
-          os.sensor_lasttime = curr_time;
-        } else {
-          // rain sensor off, write log
-          if (curr_time>os.sensor_lasttime+10) {  // add a 10 second threshold
-                                                  // to avoid faulty rain sensors generating
-                                                  // too many log records
-            write_log(LOGDATA_RAINSENSE, curr_time);
-          }
-        }
-        os.old_status.rain_sensed = os.status.rain_sensed;
-      }
-    }
+    // if (os.options[OPTION_SENSOR_TYPE] == SENSOR_TYPE_RAIN) { // if a rain sensor is connected
+    //   os.rainsensor_status();
+    //   if (os.old_status.rain_sensed != os.status.rain_sensed) {
+    //     if (os.status.rain_sensed) {
+    //       // rain sensor on, record time
+    //       os.sensor_lasttime = curr_time;
+    //     } else {
+    //       // rain sensor off, write log
+    //       if (curr_time>os.sensor_lasttime+10) {  // add a 10 second threshold
+    //                                               // to avoid faulty rain sensors generating
+    //                                               // too many log records
+    //         write_log(LOGDATA_RAINSENSE, curr_time);
+    //       }
+    //     }
+    //     os.old_status.rain_sensed = os.status.rain_sensed;
+    //   }
+    // }
+    
     // ====== Schedule program data ======
     ulong curr_minute = curr_time / 60;
     boolean match_found = false;

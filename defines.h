@@ -169,40 +169,34 @@ typedef enum {
 #undef OS_HW_VERSION
 
 /** OSPi pin defines */
-#if defined(OSPI)
+//#if defined(OSPI)
 
-#define OS_HW_VERSION    OSPI_HW_VERSION_BASE
-#define PIN_SR_LATCH      22    // shift register latch pin
-#define PIN_SR_DATA       27    // shift register data pin
-#define PIN_SR_DATA_ALT   21    // shift register data pin (alternative, for RPi 1 rev. 1 boards)
-#define PIN_SR_CLOCK       4    // shift register clock pin
-#define PIN_SR_OE         17    // shift register output enable pin
-#define PIN_RAINSENSOR    14    // rain sensor
-#define PIN_FLOWSENSOR    14    // flow sensor (currently shared with rain sensor, change if using a different pin)
-#define PIN_RF_DATA       15    // RF transmitter pin
-#define PIN_BUTTON_1      23    // button 1
-#define PIN_BUTTON_2      24    // button 2
-#define PIN_BUTTON_3      25    // button 3
+//#define OS_HW_VERSION    OSPI_HW_VERSION_BASE
+//#define PIN_SR_LATCH      22    // shift register latch pin
+// #define PIN_SR_DATA       27    // shift register data pin
+// #define PIN_SR_DATA_ALT   21    // shift register data pin (alternative, for RPi 1 rev. 1 boards)
+// #define PIN_SR_CLOCK       4    // shift register clock pin
+// #define PIN_SR_OE         17    // shift register output enable pin
+// #define PIN_RAINSENSOR    14    // rain sensor
+// #define PIN_FLOWSENSOR    14    // flow sensor (currently shared with rain sensor, change if using a different pin)
+// #define PIN_RF_DATA       15    // RF transmitter pin
 
 #define PIN_FREE_LIST		{5,6,7,8,9,10,11,12,13,16,18,19,20,21,23,24,25,26}
 
-#else
-  // For Linux or other software simulators
-  // use fake hardware pins
-  #if defined(DEMO)
-    #define OS_HW_VERSION 255   // assign hardware number 255 to DEMO firmware
-  #else
-    #define OS_HW_VERSION SIM_HW_VERSION_BASE
-  #endif
-  #define PIN_SR_LATCH    0
-  #define PIN_SR_DATA     0
-  #define PIN_SR_CLOCK    0
-  #define PIN_SR_OE       0
-  #define PIN_RAINSENSOR  0
-  #define PIN_FLOWSENSOR  0
-  #define PIN_RF_DATA     0
 
+
+#if defined(PINE)
+  #define GPIO_ZONE_1 230
+  #define GPIO_ZONE_2 69
+  #define GPIO_ZONE_3 73
+  #define GPIO_ZONE_4 80
+#else
+  #define GPIO_ZONE_1 0
+  #define GPIO_ZONE_2 0
+  #define GPIO_ZONE_3 0
+  #define GPIO_ZONE_4 0
 #endif
+
 
 #define ETHER_BUFFER_SIZE   16384
 
@@ -232,28 +226,6 @@ typedef unsigned char   uint8_t;
 typedef short           int16_t;
 typedef unsigned short  uint16_t;
 typedef bool boolean;
-
-/** Other defines */
-// button values
-#define BUTTON_1            0x01
-#define BUTTON_2            0x02
-#define BUTTON_3            0x04
-
-// button status values
-#define BUTTON_NONE         0x00  // no button pressed
-#define BUTTON_MASK         0x0F  // button status mask
-#define BUTTON_FLAG_HOLD    0x80  // long hold flag
-#define BUTTON_FLAG_DOWN    0x40  // down flag
-#define BUTTON_FLAG_UP      0x20  // up flag
-
-// button timing values
-#define BUTTON_DELAY_MS        1  // short delay (milliseconds)
-#define BUTTON_HOLD_MS      1000  // long hold expiration time (milliseconds)
-
-// button mode values
-#define BUTTON_WAIT_NONE       0  // do not wait, return value immediately
-#define BUTTON_WAIT_RELEASE    1  // wait until button is release
-#define BUTTON_WAIT_HOLD       2  // wait until button hold time expires
 
 #define DISPLAY_MSG_MS      2000  // message display time (milliseconds)
 

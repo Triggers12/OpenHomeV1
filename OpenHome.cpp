@@ -21,6 +21,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 #include <netdb.h>
+#include <iostream>
 #include "OpenHome.h"
 #include "gpio.h"
 
@@ -47,10 +48,6 @@ char tmp_buffer[TMP_BUFFER_SIZE+1];       // scratch buffer
 
 const char wtopts_filename[] = WEATHER_OPTS_FILENAME;
 const char stns_filename[]   = STATION_ATTR_FILENAME;
-
-#if defined(OSPI)
-  byte OpenHome::pin_sr_data = PIN_SR_DATA;
-#endif
 
 /** Option json names (stored in progmem) */
 // IMPORTANT: each json name is strictly 5 characters
@@ -218,7 +215,7 @@ byte OpenHome::options[] = {
   0,
   144,// this and next byte define http port number
   31,
-  OS_HW_VERSION,
+  0,  // previously was OS_HW_VERSION
   0,  // number of 8-station extension board. 0: no extension boards
   1,  // the option 'sequential' is now retired
   128,// station delay time (-59 minutes to 59 minutes).
@@ -312,39 +309,30 @@ extern void flow_isr();
 void OpenHome::begin() {
 
   // shift register setup
-  pinMode(PIN_SR_OE, OUTPUT);
+  //pinMode(PIN_SR_OE, OUTPUT);
   // pull shift register OE high to disable output
-  digitalWrite(PIN_SR_OE, HIGH);
-  pinMode(PIN_SR_LATCH, OUTPUT);
-  digitalWrite(PIN_SR_LATCH, HIGH);
+  //digitalWrite(PIN_SR_OE, HIGH);
+  //pinMode(PIN_SR_LATCH, OUTPUT);
+  //digitalWrite(PIN_SR_LATCH, HIGH);
 
-  pinMode(PIN_SR_CLOCK, OUTPUT);
+  //pinMode(PIN_SR_CLOCK, OUTPUT);
 
-#if defined(OSPI)
-  pin_sr_data = PIN_SR_DATA;
-  // detect RPi revision
-  unsigned int rev = detect_rpi_rev();
-  if (rev==0x0002 || rev==0x0003)
-    pin_sr_data = PIN_SR_DATA_ALT;
-  // if this is revision 1, use PIN_SR_DATA_ALT
-  pinMode(pin_sr_data, OUTPUT);
-#else
-  pinMode(PIN_SR_DATA,  OUTPUT);
-#endif
+  //pin_sr_data = PIN_SR_DATA;
+  //pinMode(PIN_SR_DATA,  OUTPUT);
 
 	// Reset all stations
   clear_all_station_bits();
   apply_all_station_bits();
 
   // pull shift register OE low to enable output
-  digitalWrite(PIN_SR_OE, LOW);
+  //digitalWrite(PIN_SR_OE, LOW);
 
   // Rain sensor port set up
-  pinMode(PIN_RAINSENSOR, INPUT);
+  //pinMode(PIN_RAINSENSOR, INPUT);
 
   // Set up sensors
   // OSPI and OSBO use external pullups
-  attachInterrupt(PIN_FLOWSENSOR, "falling", flow_isr);
+  //attachInterrupt(PIN_FLOWSENSOR, "falling", flow_isr);
 
   // Default controller status variables
   // Static variables are assigned 0 by default
@@ -361,8 +349,8 @@ void OpenHome::begin() {
   nstations = 8;
 
   // set rf data pin
-  pinMode(PIN_RF_DATA, OUTPUT);
-  digitalWrite(PIN_RF_DATA, LOW);
+  //pinMode(PIN_RF_DATA, OUTPUT);
+  //digitalWrite(PIN_RF_DATA, LOW);
 
   hw_type = HW_TYPE_AC;
 
@@ -373,7 +361,7 @@ void OpenHome::begin() {
  * !!! This will activate/deactivate valves !!!
  */
 void OpenHome::apply_all_station_bits() {
-  digitalWrite(PIN_SR_LATCH, LOW);
+  //digitalWrite(PIN_SR_LATCH, LOW);
   byte bid, s, sbits;
 
   // Shift out all station bit values
@@ -384,37 +372,13 @@ void OpenHome::apply_all_station_bits() {
     else
       sbits = 0;
 
+    std::cout << "Applying all homestation bits" << std::endl;
     for(s=0;s<8;s++) {
-      digitalWrite(PIN_SR_CLOCK, LOW);
-#if defined(OSPI) // if OSPI, use dynamically assigned pin_sr_data
-      digitalWrite(pin_sr_data, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
-#else
-      digitalWrite(PIN_SR_DATA, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
-#endif
-      digitalWrite(PIN_SR_CLOCK, HIGH);
+      std::cout << "sbits = " << sbits << std::endl;
+      std::cout << "1<<(7-s) = " << 1<<(7-s) << std::endl;
+      //digitalWrite(PIN_SR_DATA, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
     }
   }
-
-  digitalWrite(PIN_SR_LATCH, HIGH);
-
-  // handle refresh of RF and remote stations
-  // each time apply_all_station_bits is called
-  // we refresh the station whose index is the current time modulo MAX_NUM_STATIONS
-  static byte last_sid = 0;
-  byte sid = now() % MAX_NUM_STATIONS;
-  if (sid != last_sid) {  // avoid refreshing the same station twice in a roll
-    last_sid = sid;
-    bid=sid>>3;
-    s=sid&0x07;
-    switch_special_station(sid, (station_bits[bid]>>s)&0x01);
-  }
-}
-
-/** Read rain sensor status */
-void OpenHome::rainsensor_status() {
-  // options[OPTION_RS_TYPE]: 0 if normally closed, 1 if normally open
-  if(options[OPTION_SENSOR_TYPE]!=SENSOR_TYPE_RAIN) return;
-  status.rain_sensed = (digitalRead(PIN_RAINSENSOR) == options[OPTION_RAINSENSOR_TYPE] ? 0 : 1);
 }
 
 /** Read the number of 8-station expansion boards */
@@ -523,13 +487,7 @@ void OpenHome::switch_special_station(byte sid, byte value) {
     read_from_file(stns_filename, tmp_buffer, stepsize, sid*stepsize);
     StationSpecialData *stn = (StationSpecialData *)tmp_buffer;
     // check station type
-    if(stn->type==STN_TYPE_RF) {
-      // transmit RF signal
-      switch_rfstation((RFStationData *)stn->data, value);
-    } else if(stn->type==STN_TYPE_REMOTE) {
-      // request remote station
-      switch_remotestation((RemoteStationData *)stn->data, value);
-    } else if(stn->type==STN_TYPE_GPIO) {
+    if(stn->type==STN_TYPE_GPIO) {
       // set GPIO pin
       switch_gpiostation((GPIOStationData *)stn->data, value);
     } else if(stn->type==STN_TYPE_HTTP) {
@@ -577,47 +535,47 @@ void OpenHome::clear_all_station_bits() {
 int rf_gpio_fd = -1;
 
 /** Transmit one RF signal bit */
-void transmit_rfbit(ulong lenH, ulong lenL) {
-  gpio_write(rf_gpio_fd, 1);
-  delayMicrosecondsHard(lenH);
-  gpio_write(rf_gpio_fd, 0);
-  delayMicrosecondsHard(lenL);
-}
+// void transmit_rfbit(ulong lenH, ulong lenL) {
+//   gpio_write(rf_gpio_fd, 1);
+//   delayMicrosecondsHard(lenH);
+//   gpio_write(rf_gpio_fd, 0);
+//   delayMicrosecondsHard(lenL);
+// }
 
-/** Transmit RF signal */
-void send_rfsignal(ulong code, ulong len) {
-  ulong len3 = len * 3;
-  ulong len31 = len * 31;
-  for(byte n=0;n<15;n++) {
-    int i=23;
-    // send code
-    while(i>=0) {
-      if ((code>>i) & 1) {
-        transmit_rfbit(len3, len);
-      } else {
-        transmit_rfbit(len, len3);
-      }
-      i--;
-    };
-    // send sync
-    transmit_rfbit(len, len31);
-  }
-}
+// /** Transmit RF signal */
+// void send_rfsignal(ulong code, ulong len) {
+//   ulong len3 = len * 3;
+//   ulong len31 = len * 31;
+//   for(byte n=0;n<15;n++) {
+//     int i=23;
+//     // send code
+//     while(i>=0) {
+//       if ((code>>i) & 1) {
+//         transmit_rfbit(len3, len);
+//       } else {
+//         transmit_rfbit(len, len3);
+//       }
+//       i--;
+//     };
+//     // send sync
+//     transmit_rfbit(len, len31);
+//   }
+// }
 
-/** Switch RF station
- * This function takes a RF code,
- * parses it into signals and timing,
- * and sends it out through RF transmitter.
- */
-void OpenHome::switch_rfstation(RFStationData *data, bool turnon) {
-  ulong on, off;
-  uint16_t length = parse_rfstation_code(data, &on, &off);
-  // pre-open gpio file to minimize overhead
-  rf_gpio_fd = gpio_fd_open(PIN_RF_DATA);
-  send_rfsignal(turnon ? on : off, length);
-  gpio_fd_close(rf_gpio_fd);
-  rf_gpio_fd = -1;
-}
+// /** Switch RF station
+//  * This function takes a RF code,
+//  * parses it into signals and timing,
+//  * and sends it out through RF transmitter.
+//  */
+// void OpenHome::switch_rfstation(RFStationData *data, bool turnon) {
+//   ulong on, off;
+//   uint16_t length = parse_rfstation_code(data, &on, &off);
+//   // pre-open gpio file to minimize overhead
+//   rf_gpio_fd = gpio_fd_open(PIN_RF_DATA);
+//   send_rfsignal(turnon ? on : off, length);
+//   gpio_fd_close(rf_gpio_fd);
+//   rf_gpio_fd = -1;
+// }
 
 /** Switch GPIO station
  * Special data for GPIO Station is three bytes of ascii decimal (not hex)
@@ -635,60 +593,56 @@ void OpenHome::switch_gpiostation(GPIOStationData *data, bool turnon) {
     digitalWrite(gpio, 1-activeState);
 }
 
-/** Callback function for remote station calls */
-static void switchremote_callback(byte status, uint16_t off, uint16_t len) {
-  /* do nothing */
-}
 
-/** Switch remote station
- * This function takes a remote station code,
- * parses it into remote IP, port, station index,
- * and makes a HTTP GET request.
- * The remote controller is assumed to have the same
- * password as the main controller
- */
-void OpenHome::switch_remotestation(RemoteStationData *data, bool turnon) {
-  EthernetClient client;
+// /** Switch remote station
+//  * This function takes a remote station code,
+//  * parses it into remote IP, port, station index,
+//  * and makes a HTTP GET request.
+//  * The remote controller is assumed to have the same
+//  * password as the main controller
+//  */
+// void OpenHome::switch_remotestation(RemoteStationData *data, bool turnon) {
+//   EthernetClient client;
 
-  uint8_t hisip[4];
-  uint16_t hisport;
-  ulong ip = hex2ulong(data->ip, sizeof(data->ip));
-  hisip[0] = ip>>24;
-  hisip[1] = (ip>>16)&0xff;
-  hisip[2] = (ip>>8)&0xff;
-  hisip[3] = ip&0xff;
-  hisport = hex2ulong(data->port, sizeof(data->port));
+//   uint8_t hisip[4];
+//   uint16_t hisport;
+//   ulong ip = hex2ulong(data->ip, sizeof(data->ip));
+//   hisip[0] = ip>>24;
+//   hisip[1] = (ip>>16)&0xff;
+//   hisip[2] = (ip>>8)&0xff;
+//   hisip[3] = ip&0xff;
+//   hisport = hex2ulong(data->port, sizeof(data->port));
 
-  if (!client.connect(hisip, hisport)) {
-    client.stop();
-    return;
-  }
+//   if (!client.connect(hisip, hisport)) {
+//     client.stop();
+//     return;
+//   }
 
-  char *p = tmp_buffer + sizeof(RemoteStationData) + 1;
-  BufferFiller bf = p;
-  bf.emit_p(PSTR("GET /cm?pw=$E&sid=$D&en=$D&t=$D"),
-            ADDR_NVM_PASSWORD,
-            (int)hex2ulong(data->sid, sizeof(data->sid)),
-            turnon, 2*MAX_NUM_STATIONS);  // MAX_NUM_STATIONS is the refresh cycle
-  bf.emit_p(PSTR(" HTTP/1.0\r\nHOST: *\r\n\r\n"));
+//   char *p = tmp_buffer + sizeof(RemoteStationData) + 1;
+//   BufferFiller bf = p;
+//   bf.emit_p(PSTR("GET /cm?pw=$E&sid=$D&en=$D&t=$D"),
+//             ADDR_NVM_PASSWORD,
+//             (int)hex2ulong(data->sid, sizeof(data->sid)),
+//             turnon, 2*MAX_NUM_STATIONS);  // MAX_NUM_STATIONS is the refresh cycle
+//   bf.emit_p(PSTR(" HTTP/1.0\r\nHOST: *\r\n\r\n"));
 
-  client.write((uint8_t *)p, strlen(p));
+//   client.write((uint8_t *)p, strlen(p));
 
-  bzero(ether_buffer, ETHER_BUFFER_SIZE);
+//   bzero(ether_buffer, ETHER_BUFFER_SIZE);
 
-  time_t timeout = now() + 5; // 5 seconds timeout
-  while(now() < timeout) {
-    int len=client.read((uint8_t *)ether_buffer, ETHER_BUFFER_SIZE);
-    if (len<=0) {
-      if(!client.connected())
-        break;
-      else
-        continue;
-    }
-    switchremote_callback(0, 0, ETHER_BUFFER_SIZE);
-  }
-  client.stop();
-}
+//   time_t timeout = now() + 5; // 5 seconds timeout
+//   while(now() < timeout) {
+//     int len=client.read((uint8_t *)ether_buffer, ETHER_BUFFER_SIZE);
+//     if (len<=0) {
+//       if(!client.connected())
+//         break;
+//       else
+//         continue;
+//     }
+//     switchremote_callback(0, 0, ETHER_BUFFER_SIZE);
+//   }
+//   client.stop();
+// }
 
 /** Callback function for http station calls */
 static void switchhttp_callback(byte status, uint16_t off, uint16_t len) {
