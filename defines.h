@@ -104,8 +104,8 @@
 #define DEFAULT_PASSWORD          "a6d82bced638de3def1e9bbb4983225c"
 #define DEFAULT_LOCATION          "Boston,MA"
 #define DEFAULT_WEATHER_KEY       ""
-#define DEFAULT_JAVASCRIPT_URL    "https://ui.OpenHome.com/js"
-#define DEFAULT_WEATHER_URL       "weather.OpenHome.com"
+#define DEFAULT_JAVASCRIPT_URL    "https://ui.OpenSprinkler.com/js"
+#define DEFAULT_WEATHER_URL       "weather.OpenSprinker.com"
 
 /** Macro define of each option
   * Refer to OpenHome.cpp for details on each option
@@ -167,19 +167,6 @@ typedef enum {
 #define LOGDATA_FLOWSENSE  0x04
 
 #undef OS_HW_VERSION
-
-/** OSPi pin defines */
-//#if defined(OSPI)
-
-//#define OS_HW_VERSION    OSPI_HW_VERSION_BASE
-//#define PIN_SR_LATCH      22    // shift register latch pin
-// #define PIN_SR_DATA       27    // shift register data pin
-// #define PIN_SR_DATA_ALT   21    // shift register data pin (alternative, for RPi 1 rev. 1 boards)
-// #define PIN_SR_CLOCK       4    // shift register clock pin
-// #define PIN_SR_OE         17    // shift register output enable pin
-// #define PIN_RAINSENSOR    14    // rain sensor
-// #define PIN_FLOWSENSOR    14    // flow sensor (currently shared with rain sensor, change if using a different pin)
-// #define PIN_RF_DATA       15    // RF transmitter pin
 
 #define PIN_FREE_LIST		{5,6,7,8,9,10,11,12,13,16,18,19,20,21,23,24,25,26}
 
