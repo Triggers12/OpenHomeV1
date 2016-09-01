@@ -104,8 +104,8 @@
 #define DEFAULT_PASSWORD          "a6d82bced638de3def1e9bbb4983225c"
 #define DEFAULT_LOCATION          "Boston,MA"
 #define DEFAULT_WEATHER_KEY       ""
-#define DEFAULT_JAVASCRIPT_URL    "https://ui.OpenSprinkler.com/js"
-#define DEFAULT_WEATHER_URL       "weather.OpenSprinker.com"
+#define DEFAULT_JAVASCRIPT_URL    "https://ui.opensprinkler.com/js"
+#define DEFAULT_WEATHER_URL       "weather.opensprinkler.com"
 
 /** Macro define of each option
   * Refer to OpenHome.cpp for details on each option

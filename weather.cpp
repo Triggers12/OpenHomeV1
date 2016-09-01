@@ -24,6 +24,7 @@
 #include "etherport.h"
 #include <string.h>
 #include <stdlib.h>
+#include <iostream>
 #include <netdb.h>
 
 extern char ether_buffer[];
@@ -146,7 +147,7 @@ void GetWeather() {
         *delim = 0;
         port = atoi(delim+1);
   }
-
+  
   server = gethostbyname(tmp_buffer);
   if (!server) {
     DEBUG_PRINT("can't resolve weather server - ");

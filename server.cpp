@@ -767,7 +767,7 @@ byte server_json_programs(char *p) {
 /** Output script url form */
 byte server_view_scripturl(char *p) {
   print_html_standard_header();
-  bfill.emit_p(PSTR("<form name=of action=cu method=get><table cellspacing=\"12\"><tr><td><b>JavaScript</b>:</td><td><input type=text size=40 maxlength=40 value=\"$E\" name=jsp></td></tr><tr><td>Default:</td><td>$S</td></tr><tr><td><b>Weather</b>:</td><td><input type=text size=40 maxlength=40 value=\"$E\" name=wsp></td></tr><tr><td>Default:</td><td>$S</td></tr><tr><td><b>Password</b>:</td><td><input type=password size=32 name=pw> <input type=submit></td></tr></table></form><script src=https://ui.OpenSprinkler.com/js/hasher.js></script>"), ADDR_NVM_JAVASCRIPTURL, DEFAULT_JAVASCRIPT_URL, ADDR_NVM_WEATHERURL, DEFAULT_WEATHER_URL);
+  bfill.emit_p(PSTR("<form name=of action=cu method=get><table cellspacing=\"12\"><tr><td><b>JavaScript</b>:</td><td><input type=text size=40 maxlength=40 value=\"$E\" name=jsp></td></tr><tr><td>Default:</td><td>$S</td></tr><tr><td><b>Weather</b>:</td><td><input type=text size=40 maxlength=40 value=\"$E\" name=wsp></td></tr><tr><td>Default:</td><td>$S</td></tr><tr><td><b>Password</b>:</td><td><input type=password size=32 name=pw> <input type=submit></td></tr></table></form><script src=https://ui.opensprinkler.com/js/hasher.js></script>"), ADDR_NVM_JAVASCRIPTURL, DEFAULT_JAVASCRIPT_URL, ADDR_NVM_WEATHERURL, DEFAULT_WEATHER_URL);
   return HTML_OK;
 }
 
