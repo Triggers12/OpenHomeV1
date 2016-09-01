@@ -332,7 +332,7 @@ void OpenHome::begin() {
   // TODO: Might need to replay this, to set all avail gpio stations to output and low
   // Possibly a configuration file to determine these
   pinMode(GPIO_ZONE_1, OUTPUT);
-  digitalWrite(GPIO_ZONE_1, LOW);
+  digitalWrite(GPIO_ZONE_1, HIGH);
 
   //pinMode(PIN_RF_DATA, OUTPUT);
   //digitalWrite(PIN_RF_DATA, LOW);
