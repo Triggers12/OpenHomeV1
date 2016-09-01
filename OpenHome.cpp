@@ -432,9 +432,8 @@ void OpenHome::switch_special_station(byte sid, byte value) {
     // check station type
     if(stn->type==STN_TYPE_GPIO) {
       // set GPIO pin
-      DEBUG_PRINTLN("Switching gpio station: ")
-      DEBUG_PRINTLN(stn->data)
-      
+      std::cout << "Switching gpio pin# " << stn->data << " to value = " << value << std::endl;
+
       switch_gpiostation((GPIOStationData *)stn->data, value);
     } else if(stn->type==STN_TYPE_HTTP) {
       // send GET command
