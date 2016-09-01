@@ -101,8 +101,8 @@
 #define ADDR_NVM_OPTIONS       (ADDR_NVM_STNSPE+(MAX_EXT_BOARDS+1))  // options
 
 /** Default password, location string, weather key, script urls */
-#define DEFAULT_PASSWORD          "a6d82bced638de3def1e9bbb4983225c"
-#define DEFAULT_LOCATION          "Boston,MA"
+#define DEFAULT_PASSWORD          "Undine12"
+#define DEFAULT_LOCATION          "Clearwater,FL"
 #define DEFAULT_WEATHER_KEY       ""
 #define DEFAULT_JAVASCRIPT_URL    "https://ui.opensprinkler.com/js"
 #define DEFAULT_WEATHER_URL       "weather.opensprinkler.com"
