@@ -169,7 +169,7 @@ void do_loop()
     //     os.old_status.rain_sensed = os.status.rain_sensed;
     //   }
     // }
-    
+
     // ====== Schedule program data ======
     ulong curr_minute = curr_time / 60;
     boolean match_found = false;
@@ -282,6 +282,7 @@ void do_loop()
             if (curr_time >= q->st && curr_time < q->st+q->dur) {
 
               //turn_on_station(sid);
+              std::cout << "Turning on station " << sid << std::endl;
               os.set_station_bit(sid, 1);
 
             } //if curr_time > scheduled_start_time
