@@ -275,6 +275,7 @@ extern char ether_buffer[];
 /** Initialize network with the given mac address and http port */
 byte OpenHome::start_network() {
   unsigned int port = (unsigned int)(options[OPTION_HTTPPORT_1]<<8) + (unsigned int)options[OPTION_HTTPPORT_0];
+  std::cout << "PORT = " << port << std::endl;
 #if defined(DEMO)
   port = 80;
 #endif
