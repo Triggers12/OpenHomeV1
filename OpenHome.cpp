@@ -372,10 +372,10 @@ void OpenHome::apply_all_station_bits() {
     else
       sbits = 0;
 
-    std::cout << "Applying all homestation bits" << std::endl;
+    ///std::cout << "Applying all homestation bits" << std::endl;
     for(s=0;s<8;s++) {
-      std::cout << "sbits = " << sbits << std::endl;
-      std::cout << "1<<(7-s) = " << 1<<(7-s) << std::endl;
+      //std::cout << "sbits = " << sbits << std::endl;
+      //std::cout << "1<<(7-s) = " << 1<<(7-s) << std::endl;
       //digitalWrite(PIN_SR_DATA, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
     }
   }
