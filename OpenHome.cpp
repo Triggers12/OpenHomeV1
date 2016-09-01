@@ -309,31 +309,9 @@ extern void flow_isr();
 /** Initialize pins, controller variables, LCD */
 void OpenHome::begin() {
 
-  // shift register setup
-  //pinMode(PIN_SR_OE, OUTPUT);
-  // pull shift register OE high to disable output
-  //digitalWrite(PIN_SR_OE, HIGH);
-  //pinMode(PIN_SR_LATCH, OUTPUT);
-  //digitalWrite(PIN_SR_LATCH, HIGH);
-
-  //pinMode(PIN_SR_CLOCK, OUTPUT);
-
-  //pin_sr_data = PIN_SR_DATA;
-  //pinMode(PIN_SR_DATA,  OUTPUT);
-
 	// Reset all stations
   clear_all_station_bits();
   apply_all_station_bits();
-
-  // pull shift register OE low to enable output
-  //digitalWrite(PIN_SR_OE, LOW);
-
-  // Rain sensor port set up
-  //pinMode(PIN_RAINSENSOR, INPUT);
-
-  // Set up sensors
-  // OSPI and OSBO use external pullups
-  //attachInterrupt(PIN_FLOWSENSOR, "falling", flow_isr);
 
   // Default controller status variables
   // Static variables are assigned 0 by default
@@ -349,11 +327,15 @@ void OpenHome::begin() {
   nboards = 1;
   nstations = 8;
 
-  // set rf data pin
+  // set rf data pin 
+  
+  // TODO: Might need to replay this, to set all avail gpio stations to output and low
+  // Possibly a configuration file to determine these
+  pinMode(GPIO_ZONE_1, OUTPUT);
+  digitalWrite(GPIO_ZONE_1, LOW);
+
   //pinMode(PIN_RF_DATA, OUTPUT);
   //digitalWrite(PIN_RF_DATA, LOW);
-
-  hw_type = HW_TYPE_AC;
 
   DEBUG_PRINTLN(get_runtime_path());
 }
@@ -380,46 +362,6 @@ void OpenHome::apply_all_station_bits() {
       //digitalWrite(PIN_SR_DATA, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
     }
   }
-}
-
-/** Read the number of 8-station expansion boards */
-// AVR has capability to detect number of expansion boards
-int OpenHome::detect_exp() {
-  return -1;
-}
-
-/** Convert hex code to ulong integer */
-static ulong hex2ulong(byte *code, byte len) {
-  char c;
-  ulong v = 0;
-  for(byte i=0;i<len;i++) {
-    c = code[i];
-    v <<= 4;
-    if(c>='0' && c<='9') {
-      v += (c-'0');
-    } else if (c>='A' && c<='F') {
-      v += 10 + (c-'A');
-    } else if (c>='a' && c<='f') {
-      v += 10 + (c-'a');
-    } else {
-      return 0;
-    }
-  }
-  return v;
-}
-
-/** Parse RF code into on/off/timeing sections */
-uint16_t OpenHome::parse_rfstation_code(RFStationData *data, ulong* on, ulong *off) {
-  ulong v;
-  v = hex2ulong(data->on, sizeof(data->on));
-  if (!v) return 0;
-  if (on) *on = v;
-	v = hex2ulong(data->off, sizeof(data->off));
-  if (!v) return 0;
-  if (off) *off = v;
-	v = hex2ulong(data->timing, sizeof(data->timing));
-  if (!v) return 0;
-  return v;
 }
 
 /** Get station name from NVM */

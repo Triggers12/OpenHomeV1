@@ -704,7 +704,7 @@ void server_json_options_main() {
       bfill.emit_p(PSTR(","));
   }
 
-  bfill.emit_p(PSTR(",\"dexp\":$D,\"mexp\":$D,\"hwt\":$D}"), os.detect_exp(), MAX_EXT_BOARDS, os.hw_type);
+  bfill.emit_p(PSTR(",\"dexp\":$D,\"mexp\":$D,\"hwt\":$D}"), -1, MAX_EXT_BOARDS, os.hw_type);
   delay(1);
 }
 
