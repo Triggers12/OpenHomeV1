@@ -346,6 +346,7 @@ void OpenHome::begin() {
 void OpenHome::apply_all_station_bits() {
   //digitalWrite(PIN_SR_LATCH, LOW);
   byte bid, s, sbits;
+  std::cout << "Applying all station bits" << std::endl;
 
   // Shift out all station bit values
   // from the highest bit to the lowest
